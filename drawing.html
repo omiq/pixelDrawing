@@ -10,6 +10,12 @@
     
     function init() {
         canvas = document.getElementById('drawingCanvas');
+        canvas.addEventListener('contextmenu', function(e) {
+            if (e.button == 2) {
+            // Block right-click menu thru preventing default action.
+            e.preventDefault();
+            }
+        });
         canvasContext = canvas.getContext("2d");
         canvasContext.globalAlpha = 1;
         w = canvas.width;
@@ -65,16 +71,20 @@
     
     function mouseControl(e) {
     
+
+        console.log(e);
+
         // Get the mouse coords relative to canvas
         mouseX = parseInt((e.clientX - canvas.offsetLeft) / 20);
         mouseY = parseInt((e.clientY - canvas.offsetTop) / 20);
 
-        if (penColour == "white") 
+
+        // If using eraser then need to reapply the griidlines
+        if (penColour == "white" || e.button == 2) 
         {
-            console.log(penColour);
             canvasContext.lineWidth = 1;
             canvasContext.strokeStyle = "#eeeeee";
-            canvasContext.fillStyle = penColour;
+            canvasContext.fillStyle = "white";
             canvasContext.beginPath();
             canvasContext.fillRect((mouseX * 20), (mouseY * 20), 19, 19);
             canvasContext.strokeRect((mouseX * 20), (mouseY * 20), 20, 20);
