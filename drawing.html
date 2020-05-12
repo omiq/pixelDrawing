@@ -4,13 +4,7 @@
     <title>Pixel Drawing Version 0.1</title>
 </head>
     <script type="text/javascript">
-    var canvas, canvasContext, flag = false,
-        prevX = 0,
-        mouseX = 0,
-        prevY = 0,
-        mouseY = 0,
-        dot_flag = false;
-
+    var canvas, canvasContext,mouseX = 0, mouseY = 0;
     var penColour = "#eeeeee";
     var lineWidth = 2;
     
@@ -71,18 +65,17 @@
     }
     
     function mouseControl(e) {
-
-
-        console.log(e);
+    
 
         // Get the mouse coords relative to canvas
-        mouseX = e.clientX - canvas.offsetLeft;
-        mouseY = e.clientY - canvas.offsetTop;
+        mouseX = parseInt((e.clientX - canvas.offsetLeft) / 20);
+        mouseY = parseInt((e.clientY - canvas.offsetTop) / 20);
 
+        console.log(mouseX, mouseY);
   
         canvasContext.beginPath();
         canvasContext.fillStyle = penColour;
-        canvasContext.fillRect(mouseX, mouseY, 20, 20);
+        canvasContext.fillRect(mouseX * 20, mouseY * 20, 20, 20);
         canvasContext.closePath();
     
     }
