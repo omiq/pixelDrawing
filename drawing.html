@@ -89,18 +89,30 @@
     </script>
 
     <body onload="init()">
-        <canvas id="drawingCanvas" width="400" height="400" style="position:absolute;top:10%;left:10%;border:2px solid;"></canvas>
-        <div style="position:absolute;top:12%;left:43%;">Colour Palette</div>
-        <div style="position:absolute;top:15%;left:45%;width:10px;height:10px;background:green;" id="green" onclick="changeColour(this)"></div>
-        <div style="position:absolute;top:15%;left:46%;width:10px;height:10px;background:blue;" id="blue" onclick="changeColour(this)"></div>
-        <div style="position:absolute;top:15%;left:47%;width:10px;height:10px;background:red;" id="red" onclick="changeColour(this)"></div>
-        <div style="position:absolute;top:17%;left:45%;width:10px;height:10px;background:yellow;" id="yellow" onclick="changeColour(this)"></div>
-        <div style="position:absolute;top:17%;left:46%;width:10px;height:10px;background:orange;" id="orange" onclick="changeColour(this)"></div>
-        <div style="position:absolute;top:17%;left:47%;width:10px;height:10px;background:black;" id="black" onclick="changeColour(this)"></div>
-        <div style="position:absolute;top:20%;left:43%;">Eraser</div>
-        <div style="position:absolute;top:22%;left:45%;width:15px;height:15px;background:white;border:2px solid;" id="white" onclick="changeColour(this)"></div>
-        <img id="canvasBitmap" style="position:absolute;top:10%;left:52%;" style="display:none;">
-        <input type="button" value="Save Drawing" id="btn" size="30" onclick="saveDocument()" style="position:absolute;top:55%;left:20%;">
-        <input type="button" value="New Drawing" id="clr" size="23" onclick="newDocument()" style="position:absolute;top:55%;left:25%;">
+        <div style="margin: auto; ">
+
+            <div style="width: 400px; margin-right: 40px;border:2px solid; float: left;display:block;">
+                <canvas id="drawingCanvas" width="400" height="400"></canvas>
+            </div>
+            
+            <div style="width: 50%;  display:block; float: right; width: 100px; border: 1px solid black;"></div>
+                <p style="font-family: arial;">Colour Palette</p>
+            
+                <div style="float: left; width:60px;height:60px;background:green;" id="green" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:blue;" id="blue" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:red;" id="red" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:yellow;" id="yellow" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:orange;" id="orange" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:black;" id="black" onclick="changeColour(this)"></div>
+                <span style="clear: right;overflow: auto;display: table;content: '';"><p>&nbsp;</p></span>
+                <p style="font-family: arial;padding-top:80px">Eraser</p>
+                <div style="float: left;width:60px;height:60px;background:white;border:2px solid;" id="white" onclick="changeColour(this)"></div>
+                <span style="clear: right;overflow: auto;display: table;content: ''; height: 120px;"><p>&nbsp;</p></span>
+                <input type="button" value="Save Drawing" id="btn" size="30" onclick="saveDocument()" style="">
+                <input type="button" value="New Drawing" id="clr" size="23" onclick="newDocument()" style="">
+            </div>
+            <img id="canvasBitmap" style="position:absolute;top:10%;left:52%;" style="display:none;">
+
+         </div>
     </body>
     </html>
