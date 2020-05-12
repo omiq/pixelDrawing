@@ -6,11 +6,12 @@
     <script type="text/javascript">
     var canvas, canvasContext,mouseX = 0, mouseY = 0;
     var penColour = "#eeeeee";
-    var lineWidth = 2;
+    var lineWidth = 1;
     
     function init() {
         canvas = document.getElementById('drawingCanvas');
         canvasContext = canvas.getContext("2d");
+        canvasContext.globalAlpha = 1;
         w = canvas.width;
         h = canvas.height;
 
@@ -26,8 +27,6 @@
     
     function changeColour(obj) {
         penColour = obj.id;
-        if (penColour == "white") lineWidth = 14;
-        else lineWidth = 2;
     
     }
     
@@ -66,17 +65,36 @@
     
     function mouseControl(e) {
     
-
         // Get the mouse coords relative to canvas
         mouseX = parseInt((e.clientX - canvas.offsetLeft) / 20);
         mouseY = parseInt((e.clientY - canvas.offsetTop) / 20);
 
+        if (penColour == "white") 
+        {
+            console.log(penColour);
+            canvasContext.lineWidth = 1;
+            canvasContext.strokeStyle = "#eeeeee";
+            canvasContext.fillStyle = penColour;
+            canvasContext.beginPath();
+            canvasContext.fillRect((mouseX * 20), (mouseY * 20), 19, 19);
+            canvasContext.strokeRect((mouseX * 20), (mouseY * 20), 20, 20);
+            canvasContext.closePath();
+        }
+        else 
+        {
+            canvasContext.lineWidth = 1;
+            canvasContext.strokeStyle = penColour;
+            canvasContext.fillStyle = penColour;
+            canvasContext.beginPath();
+            canvasContext.fillRect((mouseX * 20), (mouseY * 20), 19, 19);
+            canvasContext.closePath();
+        }
+
+
+
         console.log(mouseX, mouseY);
   
-        canvasContext.beginPath();
-        canvasContext.fillStyle = penColour;
-        canvasContext.fillRect(mouseX * 20, mouseY * 20, 20, 20);
-        canvasContext.closePath();
+
     
     }
     </script>
