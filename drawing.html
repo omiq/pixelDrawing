@@ -1,0 +1,106 @@
+<html>
+
+<head>
+    <title>Pixel Drawing Version 0.1</title>
+</head>
+    <script type="text/javascript">
+    var canvas, canvasContext, flag = false,
+        prevX = 0,
+        mouseX = 0,
+        prevY = 0,
+        mouseY = 0,
+        dot_flag = false;
+
+    var penColour = "#eeeeee";
+    var lineWidth = 2;
+    
+    function init() {
+        canvas = document.getElementById('drawingCanvas');
+        canvasContext = canvas.getContext("2d");
+        w = canvas.width;
+        h = canvas.height;
+
+        canvasContext.fillStyle = penColour;
+        canvasContext.strokeStyle = penColour;
+        
+        // Set up the bitmap drawing area with grid
+        blank()
+    
+        canvas.addEventListener("mousedown", function (e) { mouseControl(e) }, false);
+
+    }
+    
+    function changeColour(obj) {
+        penColour = obj.id;
+        if (penColour == "white") lineWidth = 14;
+        else lineWidth = 2;
+    
+    }
+    
+    function blank()
+    {
+
+        canvasContext.clearRect(0, 0, w, h);
+        document.getElementById("canvasBitmap").style.display = "none";
+
+        for (x = 0; x <= w; x += 20) {
+            canvasContext.moveTo(x, 0);
+            canvasContext.lineTo(x, h);
+
+            for (y = 0; y <= h; y += 20) {
+                canvasContext.moveTo(0, y);
+                canvasContext.lineTo(w, y);
+            }
+         }
+         canvasContext.stroke();
+         penColour = "#000";
+    }
+    
+    function newDocument() {
+        var m = confirm("Delete the whole drawing - Are you sure?");
+        if (m) {
+            blank();
+        }
+    }
+    
+    function saveDocument() {
+        document.getElementById("canvasBitmap").style.border = "2px solid";
+        var dataURL = canvas.toDataURL();
+        document.getElementById("canvasBitmap").src = dataURL;
+        document.getElementById("canvasBitmap").style.display = "inline";
+    }
+    
+    function mouseControl(e) {
+
+
+        console.log(e);
+
+        // Get the mouse coords relative to canvas
+        mouseX = e.clientX - canvas.offsetLeft;
+        mouseY = e.clientY - canvas.offsetTop;
+
+  
+        canvasContext.beginPath();
+        canvasContext.fillStyle = penColour;
+        canvasContext.fillRect(mouseX, mouseY, 20, 20);
+        canvasContext.closePath();
+    
+    }
+    </script>
+
+    <body onload="init()">
+        <canvas id="drawingCanvas" width="400" height="400" style="position:absolute;top:10%;left:10%;border:2px solid;"></canvas>
+        <div style="position:absolute;top:12%;left:43%;">Colour Palette</div>
+        <div style="position:absolute;top:15%;left:45%;width:10px;height:10px;background:green;" id="green" onclick="changeColour(this)"></div>
+        <div style="position:absolute;top:15%;left:46%;width:10px;height:10px;background:blue;" id="blue" onclick="changeColour(this)"></div>
+        <div style="position:absolute;top:15%;left:47%;width:10px;height:10px;background:red;" id="red" onclick="changeColour(this)"></div>
+        <div style="position:absolute;top:17%;left:45%;width:10px;height:10px;background:yellow;" id="yellow" onclick="changeColour(this)"></div>
+        <div style="position:absolute;top:17%;left:46%;width:10px;height:10px;background:orange;" id="orange" onclick="changeColour(this)"></div>
+        <div style="position:absolute;top:17%;left:47%;width:10px;height:10px;background:black;" id="black" onclick="changeColour(this)"></div>
+        <div style="position:absolute;top:20%;left:43%;">Eraser</div>
+        <div style="position:absolute;top:22%;left:45%;width:15px;height:15px;background:white;border:2px solid;" id="white" onclick="changeColour(this)"></div>
+        <img id="canvasBitmap" style="position:absolute;top:10%;left:52%;" style="display:none;">
+        <input type="button" value="Save Drawing" id="btn" size="30" onclick="saveDocument()" style="position:absolute;top:55%;left:20%;">
+        <input type="button" value="New Drawing" id="clr" size="23" onclick="newDocument()" style="position:absolute;top:55%;left:25%;">
+    </body>
+    </html>
