@@ -104,8 +104,18 @@
     // Create finished document
     function saveDocument() {
         document.getElementById("canvasBitmap").style.border = "2px solid";
-        var dataURL = canvas.toDataURL();
-        document.getElementById("canvasBitmap").src = dataURL;
+
+
+        var resizedCanvas = document.getElementById("zoomcanvas");
+        var resizedContext = resizedCanvas.getContext("2d");
+
+        resizedCanvas.height = "900";
+        resizedCanvas.width = "900";
+
+        resizedContext.drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
+        var myResizedData = resizedCanvas.toDataURL();
+
+        document.getElementById("canvasBitmap").src = myResizedData;
         document.getElementById("canvasBitmap").style.display = "block";
 
         var instructions = {
@@ -203,6 +213,7 @@
 
             <div style="width: 400px; margin-right: 40px;border:2px solid #eeeeee; float: left;display:block; background-color: white;">
                 <canvas id="drawingCanvas" width="400" height="400"></canvas>
+                <canvas id="zoomcanvas" width="900" height="900" style="visibility: hidden;display:none;"></canvas>
             </div>
             
             <div style="width: 50%;  display:block; float: right; width: 100px;"></div>
