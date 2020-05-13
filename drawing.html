@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Pixel Drawing Version 0.6</title>
+    <title>Pixel Drawing Version 1.0</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -77,6 +77,8 @@
             }
          }
          canvasContext.stroke();
+         document.getElementById("instructions").innerHTML = "<p>";
+            document.getElementById("header").innerHTML = "<h1></h1>";
          penColour = "#000000";
     }
     
@@ -104,7 +106,7 @@
         document.getElementById("canvasBitmap").style.border = "2px solid";
         var dataURL = canvas.toDataURL();
         document.getElementById("canvasBitmap").src = dataURL;
-        document.getElementById("canvasBitmap").style.display = "inline";
+        document.getElementById("canvasBitmap").style.display = "block";
 
         var instructions = {
             "Green": "",
@@ -144,14 +146,18 @@
                 var rowNumber = String(parseInt(row/20));
                 instructions[thisColourName]+=columnLetter+rowNumber+" ";
                 if(columnLetter+rowNumber=="A0") console.log(col,row);
-                setPixel(col, row, mark);
+                //setPixel(col, row, mark);
             }
 
         }
-        console.log(instructions);
-    }
 
-    
+        document.getElementById("header").innerHTML = "<h1>Instructions</h1>";
+   
+        for (var item in instructions)
+        {
+           if(item != "White") document.getElementById("instructions").innerHTML += "<h3>"+item+"</h3>"+instructions[item]+"\n\n";
+        }
+    }    
 
     // mouse drawing routine
     function mouseControl(e) {
@@ -220,8 +226,14 @@
                 <input type="button" value="Save Drawing" id="btn" size="30" onclick="saveDocument()" style="">
                 <input type="button" value="New Drawing" id="clr" size="23" onclick="newDocument()" style="">
             </div>
-            <img id="canvasBitmap" style="position:absolute;top:10%;left:52%;" style="display:none;">
 
+            <div id="instructionsArea" style="clear: both;overflow: auto; ">
+                <div id="header" style="color: black; font-family: Arial, Helvetica, sans-serif;"></div>
+                <img id="canvasBitmap" style="display:none;">
+                <div id="instructions" style="color: darkblue; font-family: Arial, Helvetica, sans-serif;">
+                    &nbsp;
+                </div>
+            </div>
          </div>
     </body>
     </html>
