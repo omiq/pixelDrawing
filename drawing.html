@@ -5,7 +5,8 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-</head>
+    <script type="text/javascript" src="ntc.js"></script>
+
     <script type="text/javascript">
     var canvas, canvasContext,mouseX = 0, mouseY = 0;
     var penColour = "#eeeeee";
@@ -38,7 +39,7 @@
     if (r > 255 || g > 255 || b > 255)
         throw "Invalid colour!";
     var hexString = ((r << 16) | (g << 8) | b).toString(16);
-    return "#" + hexString;
+    return "#" + hexString.padStart(6, '0');
 }
     
     function changeColour(obj) {
@@ -111,7 +112,8 @@
             for (col = 10; col < 400; col += 20)
             {
                 thisPixel = canvasContext.getImageData(col, row, 1, 1).data; 
-                console.log(rgbHex(thisPixel[0], thisPixel[1], thisPixel[2]));
+                var n_match  = ntc.name(rgbHex(thisPixel[0], thisPixel[1], thisPixel[2]));
+                console.log(n_match[1]);
                 setPixel(col, row, mark);
             }
 
@@ -156,7 +158,7 @@
     
     }
     </script>
-
+</head>
     <body onload="init()">
         <div style="margin: auto; ">
 
@@ -176,7 +178,7 @@
                 <div style="float: left; width:60px;height:60px;background:silver;" id="silver" onclick="changeColour(this)"></div>
                 <div style="float: left; width:60px;height:60px;background:darkgrey;" id="darkgrey" onclick="changeColour(this)"></div>
                 <div style="float: left; width:60px;height:60px;background:darkslategray;" id="darkslategray" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:brown;" id="brown" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:saddlebrown;" id="saddlebrown" onclick="changeColour(this)"></div>
 
                 <span style="clear: right;overflow: auto;display: table;content: '';"><p>&nbsp;</p></span>
                 <p style="font-family: arial;padding-top:80px">Eraser</p>
