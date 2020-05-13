@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Pixel Drawing Version 0.3</title>
+    <title>Pixel Drawing Version 0.6</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -25,8 +25,9 @@
         w = canvas.width;
         h = canvas.height;
 
-        canvasContext.fillStyle = penColour;
+        canvasContext.fillStyle = "white";
         canvasContext.strokeStyle = penColour;
+        
         
         // Set up the bitmap drawing area with grid
         blank()
@@ -35,12 +36,20 @@
 
     }
 
+    function intHex(rgb)
+    {
+        var hex = Number(rgb).toString(16);
+        return hex.padStart(2, '0');
+    }
+
+
+
     function rgbHex(r, g, b) {
-    if (r > 255 || g > 255 || b > 255)
-        throw "Invalid colour!";
-    var hexString = ((r << 16) | (g << 8) | b).toString(16);
-    return "#" + hexString.padStart(6, '0');
-}
+        if (r > 255 || g > 255 || b > 255)
+            throw "Invalid colour!";
+        var hexString = intHex(r)+intHex(g)+intHex(b);
+        return "#" + hexString;
+    }
     
     function changeColour(obj) {
         penColour = obj.id;
@@ -55,6 +64,8 @@
         canvasContext.strokeStyle = penColour;
         canvasContext.clearRect(0, 0, w, h);
         document.getElementById("canvasBitmap").style.display = "none";
+
+        canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 
         for (x = 0; x <= w; x += 20) {
             canvasContext.moveTo(x, 0);
@@ -88,20 +99,34 @@
     }
 
     
+    // Create finished document
     function saveDocument() {
         document.getElementById("canvasBitmap").style.border = "2px solid";
         var dataURL = canvas.toDataURL();
         document.getElementById("canvasBitmap").src = dataURL;
         document.getElementById("canvasBitmap").style.display = "inline";
 
-        var instructions = {};
+        var instructions = {
+            "Green": "",
+            "Blue": "",
+            "Red": "",
+            "Yellow": "",
+            "Orange": "",
+            "Black": "",
+            "Silver": "",
+            "Grey": "",
+            "Slate Grey": "",
+            "Brown": "",
+            "White": ""
+
+        };
         var thisPixel
         
         // the colour to mark pixels as done
         mark = {
-            r: 100,
-            g: 0,
-            b: 100,
+            r: 255,
+            g: 100,
+            b: 255,
             a: 255
         };
 
@@ -111,20 +136,28 @@
 
             for (col = 10; col < 400; col += 20)
             {
-                thisPixel = canvasContext.getImageData(col, row, 1, 1).data; 
+                var thisPixel = canvasContext.getImageData(col, row, 1, 1).data; 
                 var n_match  = ntc.name(rgbHex(thisPixel[0], thisPixel[1], thisPixel[2]));
-                console.log(n_match[1]);
+                var thisColourName = n_match[1];
+                
+                var columnLetter = String.fromCharCode(65+parseInt(col/20));
+                var rowNumber = String(parseInt(row/20));
+                instructions[thisColourName]+=columnLetter+rowNumber+" ";
+                if(columnLetter+rowNumber=="A0") console.log(col,row);
                 setPixel(col, row, mark);
             }
 
         }
-
+        console.log(instructions);
     }
+
     
+
+    // mouse drawing routine
     function mouseControl(e) {
     
 
-        console.log(e);
+        //console.log(e);
 
         // Get the mouse coords relative to canvas
         mouseX = parseInt((e.clientX - canvas.offsetLeft) / 20);
@@ -152,7 +185,7 @@
             canvasContext.closePath();
         }
 
-        console.log(mouseX, mouseY);
+        //console.log(mouseX, mouseY);
   
 
     
@@ -162,11 +195,11 @@
     <body onload="init()">
         <div style="margin: auto; ">
 
-            <div style="width: 400px; margin-right: 40px;border:2px solid; float: left;display:block;">
+            <div style="width: 400px; margin-right: 40px;border:2px solid #eeeeee; float: left;display:block; background-color: white;">
                 <canvas id="drawingCanvas" width="400" height="400"></canvas>
             </div>
             
-            <div style="width: 50%;  display:block; float: right; width: 100px; border: 1px solid black;"></div>
+            <div style="width: 50%;  display:block; float: right; width: 100px;"></div>
                 <p style="font-family: arial;">Colour Palette</p>
             
                 <div style="float: left; width:60px;height:60px;background:green;" id="green" onclick="changeColour(this)"></div>
