@@ -33,6 +33,13 @@
         canvas.addEventListener("mousedown", function (e) { mouseControl(e) }, false);
 
     }
+
+    function rgbHex(r, g, b) {
+    if (r > 255 || g > 255 || b > 255)
+        throw "Invalid colour!";
+    var hexString = ((r << 16) | (g << 8) | b).toString(16);
+    return "#" + hexString;
+}
     
     function changeColour(obj) {
         penColour = obj.id;
@@ -67,6 +74,18 @@
             blank();
         }
     }
+
+    // setpixel
+    function setPixel(x,y,c) 
+    {
+        var p=canvasContext.createImageData(5,5);
+        p.data[0]=c.r;
+        p.data[1]=c.g;
+        p.data[2]=c.b;
+        p.data[3]=c.a;
+        canvasContext.putImageData(p,x,y);
+    }
+
     
     function saveDocument() {
         document.getElementById("canvasBitmap").style.border = "2px solid";
@@ -77,15 +96,23 @@
         var instructions = {};
         var thisPixel
         
-     
+        // the colour to mark pixels as done
+        mark = {
+            r: 100,
+            g: 0,
+            b: 100,
+            a: 255
+        };
 
-        for (row = 0; row < 400; row += 10)
+        // read the row and column colour values from the drawing
+        for (row = 10; row < 400; row += 20)
         {
 
-            for (col = 10; col < 400; col += 10)
+            for (col = 10; col < 400; col += 20)
             {
                 thisPixel = canvasContext.getImageData(col, row, 1, 1).data; 
-                console.log(thisPixel[0], thisPixel[1], thisPixel[2]);
+                console.log(rgbHex(thisPixel[0], thisPixel[1], thisPixel[2]));
+                setPixel(col, row, mark);
             }
 
         }
@@ -123,8 +150,6 @@
             canvasContext.closePath();
         }
 
-
-
         console.log(mouseX, mouseY);
   
 
@@ -148,6 +173,11 @@
                 <div style="float: left; width:60px;height:60px;background:yellow;" id="yellow" onclick="changeColour(this)"></div>
                 <div style="float: left; width:60px;height:60px;background:orange;" id="orange" onclick="changeColour(this)"></div>
                 <div style="float: left; width:60px;height:60px;background:black;" id="black" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:silver;" id="silver" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:darkgrey;" id="darkgrey" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:darkslategray;" id="darkslategray" onclick="changeColour(this)"></div>
+                <div style="float: left; width:60px;height:60px;background:brown;" id="brown" onclick="changeColour(this)"></div>
+
                 <span style="clear: right;overflow: auto;display: table;content: '';"><p>&nbsp;</p></span>
                 <p style="font-family: arial;padding-top:80px">Eraser</p>
                 <div style="float: left;width:60px;height:60px;background:white;border:2px solid;" id="white" onclick="changeColour(this)"></div>
