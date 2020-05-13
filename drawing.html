@@ -42,6 +42,9 @@
     function blank()
     {
 
+        penColour = "#eeeeee";
+        canvasContext.fillStyle = "#ffffff";
+        canvasContext.strokeStyle = penColour;
         canvasContext.clearRect(0, 0, w, h);
         document.getElementById("canvasBitmap").style.display = "none";
 
@@ -55,7 +58,7 @@
             }
          }
          canvasContext.stroke();
-         penColour = "#000";
+         penColour = "#000000";
     }
     
     function newDocument() {
@@ -70,6 +73,23 @@
         var dataURL = canvas.toDataURL();
         document.getElementById("canvasBitmap").src = dataURL;
         document.getElementById("canvasBitmap").style.display = "inline";
+
+        var instructions = {};
+        var thisPixel
+        
+     
+
+        for (row = 0; row < 400; row += 10)
+        {
+
+            for (col = 10; col < 400; col += 10)
+            {
+                thisPixel = canvasContext.getImageData(col, row, 1, 1).data; 
+                console.log(thisPixel[0], thisPixel[1], thisPixel[2]);
+            }
+
+        }
+
     }
     
     function mouseControl(e) {
