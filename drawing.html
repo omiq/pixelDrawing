@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Pixel Drawing Version 1.7</title>
+    <title>Pixel Drawing Version 1.8</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -258,8 +258,8 @@ const reducer = (acc, current) => {
                var outInstruction = [];
                var thisInstruction = instructions[item].replace("undefined","").trim();
                var breakUpInstruction = thisInstruction.split(' ');
-               var previousLetter;
-               var previousNumb;
+               var previousLetter = '';
+               var previousNumb = -1;
                var nextCellArray = [];
                
                for (var cell = 0; cell < breakUpInstruction.length; cell++)
