@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Pixel Drawing Version 1.2</title>
+    <title>Pixel Drawing Version 1.4</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -10,6 +10,7 @@
     <script type="text/javascript">
     var canvas, canvasContext,mouseX = 0, mouseY = 0;
     var penColour = "#eeeeee";
+    var prevColour = penColour;
     var lineWidth = 1;
     var colourPalette = {
             "Red": "#ff0000",
@@ -39,30 +40,6 @@
         };
 
 
-    
-    function init() {
-        canvas = document.getElementById('drawingCanvas');
-        canvas.addEventListener('contextmenu', function(e) {
-            if (e.button == 2) {
-            // Block right-click menu thru preventing default action.
-            e.preventDefault();
-            }
-        });
-        canvasContext = canvas.getContext("2d");
-        canvasContext.globalAlpha = 1;
-        w = canvas.width;
-        h = canvas.height;
-
-        canvasContext.fillStyle = "white";
-        canvasContext.strokeStyle = penColour;
-        
-        
-        // Set up the bitmap drawing area with grid
-        blank()
-    
-        canvas.addEventListener("mousedown", function (e) { mouseControl(e) }, false);
-
-    }
 
     function intHex(rgb)
     {
@@ -219,42 +196,96 @@
     }    
 
     // mouse drawing routine
-    function mouseControl(e) {
+    function mouseControl(e, eventType) {
     
+        // What type of mouse action is being taken?
+        switch (eventType)
+        {
+            case "down":
+                mouseControl.isDrawing = true;
+                break;
+            case "up":
+                mouseControl.isDrawing = false;
+                if (penColour == "white" && prevColour != penColour) penColour = prevColour;
+                break;
+            case "out":
+                mouseControl.isDrawing = false; 
+                break;
+            case "over":
+                mouseControl.isDrawing = false;    
+                break;
+        }
 
-        //console.log(e);
 
         // Get the mouse coords relative to canvas
         mouseX = parseInt((e.clientX - canvas.offsetLeft) / 20);
         mouseY = parseInt((e.clientY - canvas.offsetTop) / 20);
 
 
-        // If using eraser then need to reapply the griidlines
-        if (penColour == "white" || e.button == 2) 
+        if(mouseControl.isDrawing)
         {
-            canvasContext.lineWidth = 1;
-            canvasContext.strokeStyle = "#eeeeee";
-            canvasContext.fillStyle = "white";
-            canvasContext.beginPath();
-            canvasContext.fillRect((mouseX * 20), (mouseY * 20), 19, 19);
-            canvasContext.strokeRect((mouseX * 20), (mouseY * 20), 20, 20);
-            canvasContext.closePath();
-        }
-        else 
-        {
-            canvasContext.lineWidth = 1;
-            canvasContext.strokeStyle = penColour;
-            canvasContext.fillStyle = penColour;
-            canvasContext.beginPath();
-            canvasContext.fillRect((mouseX * 20), (mouseY * 20), 19, 19);
-            canvasContext.closePath();
-        }
+            // If using eraser then need to reapply the griidlines
+            if (penColour == "white" || e.button == 2) 
+            {
+                canvasContext.lineWidth = 1;
+                canvasContext.strokeStyle = "#eeeeee";
+                canvasContext.fillStyle = "white";
+                canvasContext.beginPath();
+                canvasContext.fillRect((mouseX * 20), (mouseY * 20), 19, 19);
+                canvasContext.strokeRect((mouseX * 20), (mouseY * 20), 20, 20);
+                canvasContext.closePath();
+            }
+            else 
+            {
+                canvasContext.lineWidth = 1;
+                canvasContext.strokeStyle = penColour;
+                canvasContext.fillStyle = penColour;
+                canvasContext.beginPath();
+                canvasContext.fillRect((mouseX * 20), (mouseY * 20), 19, 19);
+                canvasContext.closePath();
+            }
 
-        //console.log(mouseX, mouseY);
+        }
   
 
     
     }
+
+
+
+    
+    function init() {
+        mouseControl.isDrawing = false;
+        canvas = document.getElementById('drawingCanvas');
+        canvas.addEventListener('contextmenu', function(e) {
+            if (e.button == 2) {
+            // Block right-click menu thru preventing default action.
+                e.preventDefault();
+                mouseControl.isDrawing = true;
+                prevColour = penColour;
+                penColour = "white";
+            }
+        });
+        canvasContext = canvas.getContext("2d");
+        canvasContext.globalAlpha = 1;
+        w = canvas.width;
+        h = canvas.height;
+
+        canvasContext.fillStyle = "white";
+        canvasContext.strokeStyle = penColour;
+        
+        
+        // Set up the bitmap drawing area with grid
+        blank()
+    
+        canvas.addEventListener("mousedown", function (e) { mouseControl(e,"down") }, false);
+        canvas.addEventListener("mousemove", function (e) { mouseControl(e,"move") }, false);
+        canvas.addEventListener("mouseup", function (e) { mouseControl(e,"up") }, false);
+        canvas.addEventListener("mouseout", function (e) { mouseControl(e,"out") }, false);
+        canvas.addEventListener("mouseover", function (e) { mouseControl(e,"over") }, false);
+        
+    }
+
     </script>
 </head>
     <body onload="init()">
