@@ -260,10 +260,20 @@ const reducer = (acc, current) => {
                var breakUpInstruction = thisInstruction.split(' ');
                var previousLetter;
                var previousNumb;
+               var nextCellArray = [];
                
                for (var cell = 0; cell < breakUpInstruction.length; cell++)
                {
                    var cellArray = breakUpInstruction[cell].split(',');
+                   
+                   if (cell+1 < breakUpInstruction.length)
+                   {
+                        nextCellArray = breakUpInstruction[cell+1].split(',');
+                   }
+                   else
+                   {
+                    nextCellArray = [];
+                   }
                    var cellLetter = cellArray[0];
                    var numb = cellArray[1];
 
@@ -292,7 +302,10 @@ const reducer = (acc, current) => {
                        }
                        else
                        {
-                           outInstruction.push(cellLetter + numb);
+                           if(nextCellArray[0] != cellLetter)
+                           {
+                                outInstruction.push(cellLetter + numb);
+                           }
                        }
 
 
@@ -307,7 +320,10 @@ const reducer = (acc, current) => {
                        }
                        else
                        {
-                           outInstruction.push(cellLetter + numb);
+                        if(nextCellArray[1] != numb)
+                           {
+                                outInstruction.push(cellLetter + numb);
+                           }
                        }
 
 
@@ -320,7 +336,8 @@ const reducer = (acc, current) => {
 
 
                }
-               document.getElementById("instructions").innerHTML += "<h3>"+item+"</h3>"+outInstruction.join(' ')+"\n\n";
+               var htmlInstruction = outInstruction.join(' ').replace(/ - /gi,'-');
+               document.getElementById("instructions").innerHTML += "<h3>"+item+"</h3>"+htmlInstruction+"\n\n";
                
            }
         }
