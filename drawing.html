@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Pixel Drawing Version 1.0</title>
+    <title>Pixel Drawing Version 1.2</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -11,6 +11,34 @@
     var canvas, canvasContext,mouseX = 0, mouseY = 0;
     var penColour = "#eeeeee";
     var lineWidth = 1;
+    var colourPalette = {
+            "Red": "#ff0000",
+            "DarkRed": "#AA0000",
+            "LightPink": "#FFC0CB",
+            "Orange": "	#ED9121",
+            "Light Orange": "#FFCC00",
+            "Orange Yellow": "#FFDD00",
+            "Yellow": "#FFFF00",
+            "Yellow Green": "#DDFF00",
+            "Green": "#00FF00",
+            "DarkGreen": "#004620",
+            "Turquoise": "#40E0D0",
+            "LightBlue": "#AAAAFF",
+            "Blue": "#0000FF",
+            "DarkBlue": "#0000AA",
+            "Indigo": "#4B0082",
+            "Purple": "#800080",
+            "Magenta": "#FF00FF",
+            "LightBrown": "#8B4513",
+            "DarkBrown ": "#772211",
+            "LightGray": "#AAAAAA",
+            "DarkGray": "#DDDDDD",
+            "Black": "#000000",
+            "LightSkin": "#F5DEB3",
+            "MediumSkin": "#DEB887"
+        };
+
+
     
     function init() {
         canvas = document.getElementById('drawingCanvas');
@@ -52,12 +80,23 @@
     }
     
     function changeColour(obj) {
-        penColour = obj.id;
+        penColour = colourPalette[obj.id];
     
     }
     
     function blank()
     {
+
+
+
+        var palette = document.getElementById("paletteButtons");
+        palette.innerHTML="";
+
+        for (var colourName in colourPalette)
+        {
+            var colourButton = '<div style="display:inline-block ;width:60px;height:60px;background:' + colourPalette[colourName] +';" id="' + colourName +'" onclick="changeColour(this)"></div>';
+            palette.innerHTML+=colourButton;
+        }
 
         penColour = "#eeeeee";
         canvasContext.fillStyle = "#ffffff";
@@ -77,6 +116,7 @@
             }
          }
          canvasContext.stroke();
+
          document.getElementById("instructions").innerHTML = "<p>";
             document.getElementById("header").innerHTML = "<h1></h1>";
          penColour = "#000000";
@@ -100,9 +140,26 @@
         canvasContext.putImageData(p,x,y);
     }
 
+
+    function getKeyByValue(object, value) { 
+            for (var prop in object) { 
+                if (object.hasOwnProperty(prop)) { 
+                    if (object[prop] === value) 
+                    return prop; 
+                } 
+            } 
+        } 
+      
     
     // Create finished document
     function saveDocument() {
+
+        document.getElementById("instructions").innerHTML = "<p>";
+            document.getElementById("header").innerHTML = "<h1></h1>";
+
+        // initialize colours
+        var instructions = { };
+
         document.getElementById("canvasBitmap").style.border = "2px solid";
 
 
@@ -118,18 +175,7 @@
         document.getElementById("canvasBitmap").src = myResizedData;
         document.getElementById("canvasBitmap").style.display = "block";
 
-        var instructions = {
-            "Green": "",
-            "Blue": "",
-            "Red": "",
-            "Yellow": "",
-            "Orange": "",
-            "Black": "",
-            "Silver": "",
-            "Grey": "",
-            "Slate Grey": "",
-            "Brown": "",
-            "White": ""
+        var instructions = {       
 
         };
         var thisPixel
@@ -149,14 +195,16 @@
             for (col = 10; col < 400; col += 20)
             {
                 var thisPixel = canvasContext.getImageData(col, row, 1, 1).data; 
+
                 var n_match  = ntc.name(rgbHex(thisPixel[0], thisPixel[1], thisPixel[2]));
-                var thisColourName = n_match[1];
+                var thisColourName = n_match[1]; 
                 
+
                 var columnLetter = String.fromCharCode(65+parseInt(col/20));
                 var rowNumber = String(parseInt(row/20));
-                instructions[thisColourName]+=columnLetter+rowNumber+" ";
-                if(columnLetter+rowNumber=="A0") console.log(col,row);
-                //setPixel(col, row, mark);
+                var thisEntry = columnLetter+rowNumber+" ";
+                instructions[thisColourName]+=thisEntry;
+
             }
 
         }
@@ -165,7 +213,8 @@
    
         for (var item in instructions)
         {
-           if(item != "White") document.getElementById("instructions").innerHTML += "<h3>"+item+"</h3>"+instructions[item]+"\n\n";
+           if(item != "White") document.getElementById("instructions").innerHTML += "<h3>"+item+"</h3>"+instructions[item].replace("undefined","")+"\n\n";
+           
         }
     }    
 
@@ -217,25 +266,20 @@
             </div>
             
             <div style="width: 50%;  display:block; float: right; width: 100px;"></div>
-                <p style="font-family: arial;">Colour Palette</p>
-            
-                <div style="float: left; width:60px;height:60px;background:green;" id="green" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:blue;" id="blue" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:red;" id="red" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:yellow;" id="yellow" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:orange;" id="orange" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:black;" id="black" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:silver;" id="silver" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:darkgrey;" id="darkgrey" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:darkslategray;" id="darkslategray" onclick="changeColour(this)"></div>
-                <div style="float: left; width:60px;height:60px;background:saddlebrown;" id="saddlebrown" onclick="changeColour(this)"></div>
+                
+                
+                <div id="palette" style="min-width:200px;max-width:1000px;display:block;">
+                    <p style="font-family: arial;">Eraser</p>
+                    <div style="display:inline-block ;width:60px;height:60px;background:white;border:2px solid black;" id="white" onclick="changeColour(this)"></div>
+                    <p style="font-family: arial;">Colour Palette</p>
+                    <div id="paletteButtons"></div>
+                </div>
 
-                <span style="clear: right;overflow: auto;display: table;content: '';"><p>&nbsp;</p></span>
-                <p style="font-family: arial;padding-top:80px">Eraser</p>
-                <div style="float: left;width:60px;height:60px;background:white;border:2px solid;" id="white" onclick="changeColour(this)"></div>
+                <div id="buttons" style="min-width:200px;max-width:400px;display:block;">
                 <span style="clear: right;overflow: auto;display: table;content: ''; height: 120px;"><p>&nbsp;</p></span>
-                <input type="button" value="Save Drawing" id="btn" size="30" onclick="saveDocument()" style="">
-                <input type="button" value="New Drawing" id="clr" size="23" onclick="newDocument()" style="">
+                    <input type="button" value="Save Drawing" id="btn" size="30" onclick="saveDocument()" style="">
+                    <input type="button" value="New Drawing" id="clr" size="23" onclick="newDocument()" style="">
+                </div>
             </div>
 
             <div id="instructionsArea" style="clear: both;overflow: auto; ">
