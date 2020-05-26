@@ -45,7 +45,7 @@ const rgbHex = (r, g, b) => {
 };
 
 const changeColour = (obj) => {
-	penColour = colourPalette[obj.id];
+	penColour = colourPalette[obj.id] || obj.id;
 };
 
 const blank = () => {
