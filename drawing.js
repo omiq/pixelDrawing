@@ -101,7 +101,11 @@ const saveDocument = () => {
 	document.getElementById("header").innerHTML = "<h1></h1>";
 
 	// initialize colours
-	const instructions = { };
+	const instructions            = {};
+	const directionalInstructions = {
+		horizontal: {},
+		vertical: {}
+	};
 
 	document.getElementById("canvasBitmap").style.border = "2px solid";
 
@@ -117,20 +121,35 @@ const saveDocument = () => {
 	document.getElementById("canvasBitmap").src = resizedCanvas.toDataURL();
 	document.getElementById("canvasBitmap").style.display = "block";
 
+	const addInstructions = (row, col, direction = 'horizontal') => {
+		const thisPixel = canvasContext.getImageData(col, row, 1, 1).data;
+
+		const n_match  = ntc.name(rgbHex(thisPixel[0], thisPixel[1], thisPixel[2]));
+		const thisColourName = n_match[1];
+
+		if ( 'White' === thisColourName ) {
+			return;
+		}
+
+		const columnLetter = String.fromCharCode(65+parseInt(col/20));
+		const rowNumber    = String(parseInt(row/20));
+		instructions[thisColourName]+= columnLetter+','+rowNumber+" ";
+		directionalInstructions[direction][thisColourName] += columnLetter+','+rowNumber+" ";
+	};
+
 	// read the row and column colour values from the drawing
 	for (row = 10; row < 400; row += 20) {
 
 		for (col = 10; col < 400; col += 20) {
-			const thisPixel = canvasContext.getImageData(col, row, 1, 1).data;
+			addInstructions( row, col );
+		}
 
-			const n_match  = ntc.name(rgbHex(thisPixel[0], thisPixel[1], thisPixel[2]));
-			const thisColourName = n_match[1];
+	}
 
+	for (col = 10; col < 400; col += 20) {
 
-			const columnLetter = String.fromCharCode(65+parseInt(col/20));
-			const rowNumber = String(parseInt(row/20));
-			instructions[thisColourName]+= columnLetter+','+rowNumber+" ";
-
+		for (row = 10; row < 400; row += 20) {
+			addInstructions( row, col, 'vertical' );
 		}
 
 	}
@@ -139,73 +158,204 @@ const saveDocument = () => {
 	// Document heading
 	document.getElementById("header").innerHTML = "<h1>Instructions</h1>";
 
-	// Instructions table
-	for ( let item in instructions ) {
-		if ( item !== "White" ) {
-			const outInstruction     = [];
-			const thisInstruction    = instructions[item].replace("undefined","").trim();
-			const breakUpInstruction = thisInstruction.split(' ');
-
-			let previousLetter = '';
-			let previousNumb   = -1;
-			let nextCellArray  = [];
-
-			for ( let cell = 0; cell < breakUpInstruction.length; cell++ ) {
-				const cellArray = breakUpInstruction[cell].split(',');
-
-				if ( cell+1 < breakUpInstruction.length ) {
-					nextCellArray = breakUpInstruction[cell+1].split(',');
-				}
-				else {
-					nextCellArray = [];
-				}
-				const cellLetter = cellArray[0];
-				const numb       = cellArray[1];
+	const buildInstructions = () => {
+		// Instructions table
+		for (let item in instructions) {
+			if (item !== "White") {
+				const outInstruction = [];
+				const horizontalInstruction    = directionalInstructions.horizontal[item].replace("undefined", "").trim();
+				const verticalInstruction      = directionalInstructions.vertical[item].replace("undefined", "").trim();
+				const horizontalInstructionArr = horizontalInstruction.split(' ');
+				const verticalInstructionArr   = verticalInstruction.split(' ');
+				const horizontalLines          = [];
+				const verticalLines            = [];
 
 
-				// both different
-				if ( cellLetter !== previousLetter && numb !== previousNumb ) {
-					if ( outInstruction[ outInstruction.length-1 ] === '-' ) {
-						outInstruction.push(previousLetter + previousNumb);
+				let lineSegmentPixels  = [];
+				let singlePixels       = [];
+
+				console.log({ horizontalInstructionArr: horizontalInstructionArr, verticalInstructionArr: verticalInstructionArr });
+
+				let previousLetter = '@';
+				let previousNumber = -1;
+				let lineSegment   = [];
+				let lineStart      = '';
+				let lineEnd        = '';
+				let count          = 0;
+
+				const resetVars = ( start = '' ) => {
+					lineStart    = start;
+					lineEnd      = '';
+					lineSegment = [];
+				};
+
+				horizontalInstructionArr.forEach( (cell) => {
+					const cellArray     = cell.split(',');
+					const cellFlat      = cell.replace(',', '');
+					const currentLetter = cellArray[0];
+					const currentNumber = cellArray[1];
+
+					if ( previousNumber !== currentNumber ) {
+						if ( lineStart !== '' ) {
+							if ( lineStart === lineEnd || '' === lineEnd ) {
+								singlePixels.push( lineStart );
+							} else {
+								horizontalLines.push( lineStart + '-' + lineEnd );
+								lineSegmentPixels = lineSegmentPixels.concat( lineSegment );
+							}
+						}
+						previousLetter = '@';
+
+						resetVars();
 					}
-					else {
-						outInstruction.push(cellLetter + numb);
-					}
-				}
 
-				// number different
-				if ( cellLetter === previousLetter && numb !== previousNumb ) {
-					if ( outInstruction[outInstruction.length-1] !== '-' ) {
-						outInstruction.push('-');
+					if ( lineStart === '' ) {
+						lineStart = cellFlat;
 					}
-					else {
-						if( nextCellArray[0] !== cellLetter ) {
-							outInstruction.push(cellLetter + numb);
+
+					lineSegment.push( cellFlat );
+
+					const prevLetAsNum = previousLetter.charCodeAt(0) - 65;
+					const currLetAsNum = currentLetter.charCodeAt(0) - 65;
+
+					if ( currLetAsNum - 1 === prevLetAsNum ) {
+						lineEnd = cellFlat;
+					} else if ( lineStart !== '' ) {
+						if ( lineStart === lineEnd || lineEnd === '' ) {
+							singlePixels.push( lineStart );
+						} else {
+							horizontalLines.push( lineStart + '-' + lineEnd );
+							lineSegmentPixels = lineSegmentPixels.concat( lineSegment );
+						}
+
+						resetVars( cellFlat );
+					}
+
+					count++;
+
+					if ( count === horizontalInstructionArr.length ) {
+						if ( lineStart !== '' ) {
+							if ( lineStart === lineEnd || '' === lineEnd ) {
+								singlePixels.push( cellFlat );
+							} else {
+								horizontalLines.push( lineStart + '-' + lineEnd );
+								lineSegmentPixels = lineSegmentPixels.concat( lineSegment );
+							}
 						}
 					}
-				}
 
-				// Letter different
-				if ( cellLetter !== previousLetter && numb === previousNumb ) {
-					if ( outInstruction[outInstruction.length-1] !== '-' ) {
-						outInstruction.push('-');
-					}
-					else {
-						if ( nextCellArray[1] !== numb ) {
-							outInstruction.push(cellLetter + numb);
+					previousNumber = currentNumber;
+					previousLetter = currentLetter;
+				});
+
+				console.log({
+					horizontalLines: horizontalLines,
+					verticalLines: verticalLines,
+					singlePixels: singlePixels,
+					lineSegmentPixels: lineSegmentPixels,
+				} );
+
+				resetVars();
+
+				count = 0;
+
+				const removeSinglePixels = () => {
+					console.log({
+						singlePixels: singlePixels,
+						lineSegment: lineSegment,
+					});
+					singlePixels = singlePixels.filter( x => !lineSegment.includes(x) );
+				};
+
+				const maybeHandleLastItem = () => {
+					count++;
+					if ( count === verticalInstructionArr.length ) {
+						if ( lineStart !== '' ) {
+							if ( lineStart !== lineEnd && '' !== lineEnd ) {
+								verticalLines.push( lineStart + '-' + lineEnd );
+								removeSinglePixels();
+							}
 						}
 					}
-				}
+				};
 
-				previousLetter = cellLetter;
-				previousNumb   = numb;
+				verticalInstructionArr.forEach((cell) => {
+					const cellArray     = cell.split(',');
+					const cellFlat      = cell.replace(',', '');
+					const currentLetter = cellArray[0];
+					const currentNumber = parseInt( cellArray[1] );
 
+					if ( lineSegmentPixels.includes( cellFlat ) ) {
+						maybeHandleLastItem();
+						return;
+					}
 
+					console.log( {
+						cellArray: cellArray,
+						currentLetter: currentLetter,
+						currentNumber: currentNumber,
+						previousLetter: previousLetter,
+						previousNumber: previousNumber,
+					} );
+
+					if ( previousLetter !== currentLetter ) {
+						console.log({
+							scope: 'new col',
+							lineStart: lineStart,
+							lineEnd: lineEnd,
+						});
+						if ( lineStart !== '' ) {
+							if ( lineStart !== lineEnd && '' !== lineEnd ) {
+								verticalLines.push( lineStart + '-' + lineEnd );
+								removeSinglePixels();
+							}
+						}
+						previousNumber = -1;
+
+						resetVars();
+					}
+
+					if ( lineStart === '' ) {
+						lineStart = cellFlat;
+					}
+
+					lineSegment.push( cellFlat );
+
+					if ( currentNumber - 1 === previousNumber ) {
+						lineEnd = cellFlat;
+					} else if ( lineStart !== '' ) {
+						if ( lineStart !== lineEnd && '' !== lineEnd ) {
+							verticalLines.push( lineStart + '-' + lineEnd );
+							removeSinglePixels();
+						}
+
+						resetVars( cellFlat );
+					}
+
+					maybeHandleLastItem();
+
+					previousNumber = currentNumber;
+					previousLetter = currentLetter;
+				});
+
+				console.log({
+					horizontalLines: horizontalLines,
+					verticalLines: verticalLines,
+					singlePixels: singlePixels,
+					count: count,
+					verticalInstructionArrLength: verticalInstructionArr.length
+				} );
+
+				outInstruction.push( horizontalLines, verticalLines, singlePixels );
+				const htmlInstruction    = [...new Set( outInstruction )].join(', ');
+				document.getElementById("instructions").innerHTML += "<h3>" + item + "</h3>" + htmlInstruction + "\n\n";
+
+				console.log( { outInstruction: outInstruction, htmlInstruction: htmlInstruction })
 			}
-			const htmlInstruction = outInstruction.join(' ').replace(/ - /gi,'-');
-			document.getElementById("instructions").innerHTML += "<h3>"+item+"</h3>"+htmlInstruction+"\n\n";
 		}
-	}
+	};
+
+	buildInstructions();
 };
 
 // mouse drawing routine
