@@ -215,8 +215,6 @@ const saveDocument = () => {
 						lineStart = cellFlat;
 					}
 
-					lineSegment.push( cellFlat );
-
 					const prevLetAsNum = previousLetter.charCodeAt(0) - 65;
 					const currLetAsNum = currentLetter.charCodeAt(0) - 65;
 
@@ -231,6 +229,8 @@ const saveDocument = () => {
 						}
 
 						resetVars( cellFlat );
+					} else {
+						lineSegment.push( cellFlat );
 					}
 
 					firstRow = false;
@@ -288,6 +288,8 @@ const saveDocument = () => {
 					const cellFlat      = cell.replace(',', '');
 					const currentLetter = cellArray[0];
 					const currentNumber = parseInt( cellArray[1] );
+
+					console.log(cellFlat);
 
 					if ( lineSegmentPixels.includes( cellFlat ) ) {
 						maybeHandleLastItem();
