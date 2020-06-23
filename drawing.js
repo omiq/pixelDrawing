@@ -182,6 +182,8 @@ const saveDocument = () => {
 				let lineStart      = '';
 				let lineEnd        = '';
 				let count          = 0;
+				let firstRow       = true;
+				let firstCol       = true;
 
 				const resetVars = ( start = '' ) => {
 					lineStart    = start;
@@ -220,7 +222,7 @@ const saveDocument = () => {
 
 					if ( currLetAsNum - 1 === prevLetAsNum ) {
 						lineEnd = cellFlat;
-					} else if ( lineStart !== '' ) {
+					} else if ( lineStart !== '' && ! firstRow ) {
 						if ( lineStart === lineEnd || lineEnd === '' ) {
 							singlePixels.push( lineStart );
 						} else {
@@ -230,6 +232,8 @@ const saveDocument = () => {
 
 						resetVars( cellFlat );
 					}
+
+					firstRow = false;
 
 					count++;
 
@@ -321,7 +325,7 @@ const saveDocument = () => {
 
 					lineSegment.push( cellFlat );
 
-					if ( currentNumber - 1 === previousNumber ) {
+					if ( currentNumber - 1 === previousNumber && ! firstCol ) {
 						lineEnd = cellFlat;
 					} else if ( lineStart !== '' ) {
 						if ( lineStart !== lineEnd && '' !== lineEnd ) {
@@ -332,11 +336,15 @@ const saveDocument = () => {
 						resetVars( cellFlat );
 					}
 
+					firstCol = false;
+
 					maybeHandleLastItem();
 
 					previousNumber = currentNumber;
 					previousLetter = currentLetter;
 				});
+
+				singlePixels = [... new Set( singlePixels )];
 
 				console.log({
 					horizontalLines: horizontalLines,
