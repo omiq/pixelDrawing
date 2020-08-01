@@ -191,6 +191,11 @@ const saveDocument = () => {
 					lineSegment = [];
 				};
 
+				// Store all single pixels.
+				horizontalInstructionArr.forEach( (cell) => {
+					singlePixels.push( cell.replace(',', '') );
+				} );
+
 				horizontalInstructionArr.forEach( (cell) => {
 					const cellArray     = cell.split(',');
 					const cellFlat      = cell.replace(',', '');
@@ -199,9 +204,7 @@ const saveDocument = () => {
 
 					if ( previousNumber !== currentNumber ) {
 						if ( lineStart !== '' ) {
-							if ( lineStart === lineEnd || '' === lineEnd ) {
-								singlePixels.push( lineStart );
-							} else {
+							if ( lineStart !== lineEnd && '' !== lineEnd ) {
 								horizontalLines.push( lineStart + '-' + lineEnd );
 								lineSegmentPixels = lineSegmentPixels.concat( lineSegment );
 							}
@@ -221,16 +224,13 @@ const saveDocument = () => {
 					if ( currLetAsNum - 1 === prevLetAsNum ) {
 						lineEnd = cellFlat;
 					} else if ( lineStart !== '' && ! firstRow ) {
-						if ( lineStart === lineEnd || lineEnd === '' ) {
-							singlePixels.push( lineStart );
-						} else {
+						if ( lineStart !== lineEnd && lineEnd !== '' ) {
 							horizontalLines.push( lineStart + '-' + lineEnd );
+							lineSegment.push( lineEnd );
 							lineSegmentPixels = lineSegmentPixels.concat( lineSegment );
 						}
 
 						resetVars( cellFlat );
-					} else {
-						lineSegment.push( cellFlat );
 					}
 
 					firstRow = false;
@@ -239,17 +239,21 @@ const saveDocument = () => {
 
 					if ( count === horizontalInstructionArr.length ) {
 						if ( lineStart !== '' ) {
-							if ( lineStart === lineEnd || '' === lineEnd ) {
-								singlePixels.push( cellFlat );
-							} else {
+							if ( lineStart !== lineEnd && '' !== lineEnd ) {
 								horizontalLines.push( lineStart + '-' + lineEnd );
+								lineSegment.push( lineEnd );
 								lineSegmentPixels = lineSegmentPixels.concat( lineSegment );
 							}
 						}
+
+						return;
 					}
 
 					previousNumber = currentNumber;
 					previousLetter = currentLetter;
+
+					lineSegment.push( cellFlat );
+
 				});
 
 				console.log({
@@ -266,9 +270,9 @@ const saveDocument = () => {
 				const removeSinglePixels = () => {
 					console.log({
 						singlePixels: singlePixels,
-						lineSegment: lineSegment,
+						lineSegmentPixels: lineSegmentPixels,
 					});
-					singlePixels = singlePixels.filter( x => !lineSegment.includes(x) );
+					singlePixels = singlePixels.filter( x => ! lineSegmentPixels.includes(x) );
 				};
 
 				const maybeHandleLastItem = () => {
@@ -277,13 +281,14 @@ const saveDocument = () => {
 						if ( lineStart !== '' ) {
 							if ( lineStart !== lineEnd && '' !== lineEnd ) {
 								verticalLines.push( lineStart + '-' + lineEnd );
-								removeSinglePixels();
+								lineSegment.push( lineEnd );
+								lineSegmentPixels = lineSegmentPixels.concat( lineSegment );
 							}
 						}
 					}
 				};
 
-				verticalInstructionArr.forEach((cell) => {
+				verticalInstructionArr.forEach( (cell) => {
 					const cellArray     = cell.split(',');
 					const cellFlat      = cell.replace(',', '');
 					const currentLetter = cellArray[0];
@@ -296,24 +301,14 @@ const saveDocument = () => {
 						return;
 					}
 
-					console.log( {
-						cellArray: cellArray,
-						currentLetter: currentLetter,
-						currentNumber: currentNumber,
-						previousLetter: previousLetter,
-						previousNumber: previousNumber,
-					} );
-
 					if ( previousLetter !== currentLetter ) {
-						console.log({
-							scope: 'new col',
-							lineStart: lineStart,
-							lineEnd: lineEnd,
-						});
+						firstCol = true;
+
 						if ( lineStart !== '' ) {
 							if ( lineStart !== lineEnd && '' !== lineEnd ) {
 								verticalLines.push( lineStart + '-' + lineEnd );
-								removeSinglePixels();
+								lineSegment.push( lineEnd );
+								lineSegmentPixels = lineSegmentPixels.concat( lineSegment );
 							}
 						}
 						previousNumber = -1;
@@ -325,14 +320,13 @@ const saveDocument = () => {
 						lineStart = cellFlat;
 					}
 
-					lineSegment.push( cellFlat );
-
-					if ( currentNumber - 1 === previousNumber && ! firstCol ) {
+					if ( currentNumber - 1 === previousNumber ) {
 						lineEnd = cellFlat;
-					} else if ( lineStart !== '' ) {
-						if ( lineStart !== lineEnd && '' !== lineEnd ) {
-							verticalLines.push( lineStart + '-' + lineEnd );
-							removeSinglePixels();
+					} else if ( lineStart !== '' && ! firstCol ) {
+						if ( lineStart !== lineEnd && lineEnd !== '' ) {
+							horizontalLines.push( lineStart + '-' + lineEnd );
+							lineSegment.push( lineEnd );
+							lineSegmentPixels = lineSegmentPixels.concat( lineSegment );
 						}
 
 						resetVars( cellFlat );
@@ -340,11 +334,17 @@ const saveDocument = () => {
 
 					firstCol = false;
 
+					count++;
+
 					maybeHandleLastItem();
+
+					lineSegment.push( cellFlat );
 
 					previousNumber = currentNumber;
 					previousLetter = currentLetter;
 				});
+
+				removeSinglePixels();
 
 				singlePixels = [... new Set( singlePixels )];
 
@@ -353,6 +353,7 @@ const saveDocument = () => {
 					verticalLines: verticalLines,
 					singlePixels: singlePixels,
 					count: count,
+					lineSegmentPixels: lineSegmentPixels,
 					verticalInstructionArrLength: verticalInstructionArr.length
 				} );
 
