@@ -132,7 +132,7 @@ const saveDocument = () => {
 		}
 
 		const columnLetter = String.fromCharCode(65+parseInt(col/20));
-		const rowNumber    = String(parseInt(row/20));
+		const rowNumber    = String( ( parseInt(row/20) - 20 ) * -1);
 		instructions[thisColourName]+= columnLetter+','+rowNumber+" ";
 		directionalInstructions[direction][thisColourName] += columnLetter+','+rowNumber+" ";
 	};
@@ -162,11 +162,12 @@ const saveDocument = () => {
 		// Instructions table
 		for (let item in instructions) {
 			if (item !== "White") {
+
 				const outInstruction = [];
 				const horizontalInstruction    = directionalInstructions.horizontal[item].replace("undefined", "").trim();
 				const verticalInstruction      = directionalInstructions.vertical[item].replace("undefined", "").trim();
 				const horizontalInstructionArr = horizontalInstruction.split(' ');
-				const verticalInstructionArr   = verticalInstruction.split(' ');
+				const verticalInstructionArr   = verticalInstruction.split(' ').reverse();
 				const horizontalLines          = [];
 				const verticalLines            = [];
 
@@ -356,11 +357,6 @@ const saveDocument = () => {
 					lineSegmentPixels: lineSegmentPixels,
 					verticalInstructionArrLength: verticalInstructionArr.length
 				} );
-
-				// reverse all the things.
-				horizontalLines.reverse();
-				verticalLines.reverse();
-				singlePixels.reverse();
 
 				outInstruction.push( horizontalLines, verticalLines, singlePixels );
 				const htmlInstruction    = [...new Set( outInstruction )].join(', ');
