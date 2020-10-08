@@ -357,6 +357,11 @@ const saveDocument = () => {
 					verticalInstructionArrLength: verticalInstructionArr.length
 				} );
 
+				// reverse all the things.
+				horizontalLines.reverse();
+				verticalLines.reverse();
+				singlePixels.reverse();
+
 				outInstruction.push( horizontalLines, verticalLines, singlePixels );
 				const htmlInstruction    = [...new Set( outInstruction )].join(', ');
 				document.getElementById("instructions").innerHTML += "<h3>" + item + "</h3>" + htmlInstruction + "\n\n";
